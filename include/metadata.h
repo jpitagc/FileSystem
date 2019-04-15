@@ -5,7 +5,7 @@
  * @brief 	Definition of the structures and data types of the file system.
  * @date	01/03/2017
  */
-
+#include <stdint.h>
 
 #define ELEM_IN_FILE_SYS 40 // NF1
 #define ELEM_IN_DIRECTORY 10 //NF2
