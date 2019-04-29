@@ -6,6 +6,8 @@
  * @date	01/03/2017
  */
 #include <stdint.h>
+#include <inttypes.h> 
+
 
 #define ELEM_IN_FILE_SYS 40 // NF1
 #define ELEM_IN_DIRECTORY 10 //NF2
@@ -15,30 +17,35 @@
 #define DEEPTH_MAX 3 // NF5;
 #define FILE_MAX_SIZE 2048 // NF6: El tamaño máximo de un fichero será de un bloque.
 #define BLOCK_SIZE 2048 // NF7: El tamaño de bloque del sistema será de 2048 bytes
-#define FILE_SYS_MAX_SIZE 102400 //NF9 :El sistema de ficheros será usado en discos de 50 KiB a 10 MiB.
-#define FILE_SYS_MIN_SIZE 51200 // NF9
+
+//NF9 :El sistema de ficheros será usado en discos de 50 KiB a 10 MiB.
+#define FILE_SYS_MAX_SIZE 104857600 // 1048576 * 100
+#define FILE_SYS_MIN_SIZE 51200 // 1024 * 50 
+
 #define TYPE_DIRECTORY 1
 #define TYPE_FILE 0
+#define EMPTY 7
 #define OPEN 1
 #define CLOSE 0
 
 
 
 typedef struct INodo {
-  char *name; //Nombre del fichero/directorio 
+  char *name; //Nombre del fichero/directori 
   uint8_t type; // Indica si es fichero/directorio
   uint8_t directBlock; //Bloque asociado
-  uint8_t opened; //Indica si está abierto o no
-  uint8_t inodes[ELEM_IN_DIRECTORY]; // Inodos contenidos if type = TYPE_DIRECTORY
-  uint16_t bytesUsed; //Bytes usados por el fichero
+  uint8_t opened; //Indica si está abierto o no en caso de fichero 
+  uint16_t bytesUse; //Bytes usados por el fichero
   uint16_t pointer; //Puntero del fichero
+
+  uint8_t subdirectorios[ELEM_IN_DIRECTORY]; // Array con los inodos subdirectorio de este
+  uint8_t sub_libre;
   //uint16_t Check; 
+    /*uint8_t inodes[ELEM_IN_DIRECTORY]; // Inodos contenidos if type = TYPE_DIRECTORY*/
 } INodo;
 
 typedef struct Superblock {
-  long size; //Tamaño del disco
-  uint64_t INodoMap; //Mpa de indos
-  struct INodo iNodos[ELEM_IN_FILE_SYS]; //Array donde se almacenan los i-nodos
+  long size; //Tamaño del disco en numero de bloques
   uint8_t firstFreeInode;
   //uint16_t Check; 
 } Superblock;

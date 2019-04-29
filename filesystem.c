@@ -10,14 +10,18 @@
 #include "include/auxiliary.h"  // Headers for auxiliary functions
 #include "include/metadata.h"   // Type and structure declaration of the file system
 
-
+#include <string.h>
+#include <stdint.h>
+#include <inttypes.h> 
 
 
 Superblock superblock;
+INodo iNodos[ELEM_IN_FILE_SYS]; //Array donde se almacenan los i-nodos
 
 
 
-
+char * carpetas[DEEPTH_MAX + 1];
+uint8_t ultim=-1 ;
 /*
  * @brief 	Generates the proper file system structure in a storage device, as designed by the student.
  * @return 	0 if success, -1 otherwise.
@@ -25,10 +29,13 @@ Superblock superblock;
 int mkFS(long deviceSize)
 {  
 	 //NF9: El sistema de ficheros será usado en discos de 50 KiB a 10 MiB
-	if (deviceSize < FILE_SYS_MIN_SIZE || deviceSize > FILE_SYS_MAX_SIZE ) return -1;
-	superblock.size = deviceSize;
+	if (deviceSize < FILE_SYS_MIN_SIZE || deviceSize > FILE_SYS_MAX_SIZE) return -1;
+	superblock.size =(deviceSize/BLOCK_SIZE)-1;
+	superblock.firstFreeInode = 0;
 	for(int i=0; i<ELEM_IN_FILE_SYS; i++){
-         
+		memset(&(iNodos[i]), 0, sizeof(INodo) );
+		iNodos[i].type = EMPTY;
+		iNodos[i].sub_libre = 0;
 	}
 	return 0;
 }
@@ -56,7 +63,34 @@ int unmountFS(void)
  * @return	0 if success, -1 if the file already exists, -2 in case of error.
  */
 int createFile(char *path)
-{
+{  
+    // Comprobamos que el path no supera el limite permitido 
+    if (strlen(path)>FULLPATH_MAX_FILE){
+    	return -2;
+    }
+
+    // Obtenemos si existe un nodo libre 
+    uint8_t hijo = ialloc();
+    if(hijo == -1){
+    	return -2;
+    } 
+
+    // CHECK DEL PATH
+
+
+    // Obtenemos el inodo padre del que se va a crear
+     uint8_t padre = namei(carpetas(ultim-1));
+     if(iNodos[padre].sub_libre>9 || iNodos[padre].type = TYPE_FILE){
+     	return -2;
+     }else {
+       iNodos[hijo].name = carpetas(ultim);
+       iNodos[hijo].type = TYPE_FILE;
+       iNodos[padre].subdirectorios[sub_libre]= hijo;
+     }
+
+
+
+    
 
      
 	return -2;
@@ -142,3 +176,62 @@ int lsDir(char *path, int inodesDir[10], char namesDir[10][33])
 {
 	return -2;
 }
+
+
+
+
+/*----------------------------------------------------------------------------------------------------------------*/
+/*----------------------------------------------------------------------------------------------------------------*/
+/*----------------------------------------------------------------------------------------------------------------*/
+
+/*Implementation adicional */
+
+int ialloc(void){
+    for(int i = 0; i<ELEM_IN_FILE_SYS;i++){
+    	if(iNodos[i].type == EMPTY){
+    		return i;
+    	}
+    }
+
+    return -1;
+}
+
+int namei ( char *fileName ){
+	
+	for (int i=0; i<ELEM_IN_FILE_SYS; i++){
+		if (strcmp(iNodos[i].name, fileName)==0)
+		return i;
+	}
+	
+	return -1;
+}
+
+
+
+
+
+
+
+
+
+
+void tokenaizor (char * cadena){
+	for(int i = 0; i< DEEPTH_MAX + 1;i++){
+		carpetas[i]= NULL;
+	}
+
+	for(int i = 0; carpetas[i-1] != NULL && i < DEEPTH_MAX + 1; i++){
+        carpetas[i]= strtok(cadena, "/");
+        ultim = i;
+	}
+    
+}
+
+/*bool check (void){
+	for(int i = 0; i< DEEPTH_MAX && carpetas[i+1] != NULL;i++){
+		if(namei(carpetas[i])== -1){
+			return false;
+		}
+	}
+	return true;
+}*/
