@@ -32,22 +32,22 @@
 
 typedef struct INodo {
   char *name; //Nombre del fichero/directori 
+  char *path;
   uint8_t type; // Indica si es fichero/directorio
-  uint8_t directBlock; //Bloque asociado
+  uint8_t bloque; //Bloque asociado
   uint8_t opened; //Indica si está abierto o no en caso de fichero 
-  uint16_t bytesUse; //Bytes usados por el fichero
-  uint16_t pointer; //Puntero del fichero
+  uint16_t bytesUsed; //Bytes usados por el fichero
+  uint16_t puntero; //Puntero del fichero
 
   uint8_t subdirectorios[ELEM_IN_DIRECTORY]; // Array con los inodos subdirectorio de este
-  uint8_t sub_libre;
-  //uint16_t Check; 
-    /*uint8_t inodes[ELEM_IN_DIRECTORY]; // Inodos contenidos if type = TYPE_DIRECTORY*/
+  uint8_t sub_lib;
+  
 } INodo;
 
 typedef struct Superblock {
   long size; //Tamaño del disco en numero de bloques
-  uint8_t firstFreeInode;
-  //uint16_t Check; 
+  char bitmap[4];
+  
 } Superblock;
 
 #define bitmap_getbit(bitmap_, i_) (bitmap_[i_ >> 3] & (1 << (i_ & 0x07)))

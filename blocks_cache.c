@@ -21,6 +21,7 @@ int bread(char *deviceName, int blockNumber, char *buffer) {
 
 	if(fd < 0){
 		/* fprintf(stderr, "ERROR: UNABLE TO OPEN DISK FILE %s \n", deviceName); */
+
 		return -1;
 	}
 
